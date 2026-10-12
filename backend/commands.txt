@@ -1,0 +1,29 @@
+python -m venv venv
+venv\Scripts\activate
+
+pip install django djangorestframework djangorestframework-simplejwt django-cors-headers drf-nested-routers
+
+pip freeze > requirements.txt
+
+cd backend
+django-admin startproject config .
+python manage.py startapp users
+python manage.py startapp exercises
+python manage.py startapp workout
+
+python manage.py check
+python manage.py makemigrations exercises --empty -n seed_initial_data
+python manage.py migrate exercises
+python manage.py createsuperuser
+python manage.py runserver 
+
+
+cd frontend
+npm create vite@latest . -- --template react
+npm install
+npm install axios react-router-dom
+
+
+/api/users/ http://localhost:5173/api/users/ -> 404
+                    |
+http://localhost:8000/api/users/ -> CORS
