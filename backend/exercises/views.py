@@ -20,7 +20,7 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     search_field = ['name']
 
     def get_queryset(self):
-        qs = Exercise.objects.select_related('muscle_group').all()
+        qs = Exercise.objects.select_related('muscle_group').all().order_by('name')
         muscle_group_id = self.request.query_params.get('muscle_group')
         if muscle_group_id:
             qs = qs.filter(muscle_group_id=muscle_group_id)

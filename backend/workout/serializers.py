@@ -11,7 +11,7 @@ class TemplateExerciseSerializer(serializers.ModelSerializer):
                                           read_only=True)
     class Meta:
         model = TemplateExercise
-        fields = ('id', 'name', 'exercise_name', 'order')
+        fields = ('id', 'exercise', 'exercise_name', 'order')
 
 
 class WorkoutTemplateSerializer(serializers.ModelSerializer):
@@ -21,24 +21,27 @@ class WorkoutTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkoutTemplate
         fields = ('id', 'name', 'created_at', 'exercises') 
-        read_only_fields = ('created_at')
+        read_only_fields = ('created_at',)
 
 class TemplateExerciseCreateSerializer(serializers.ModelSerializer):
+    order = serializers.IntegerField(required=False, allow_null=True)
+
     class Meta:
         model = TemplateExercise
-        fields = ('id', 'name', 'order')
+        fields = ('id', 'exercise', 'order')
 
-    def  validate_exercise(self, value):
+    def validate_exercise(self, value):
         if not Exercise.objects.filter(id=value.id).exists():
             raise serializers.ValidationError('Упражнение не найдено')
-        return value 
-    
+        return value
+
     def create(self, validated_data):
-        if 'order' not in validated_data or validated_data.get('order') is None:
+        if validated_data.get('order') is None:
             template = validated_data['template']
             max_order = TemplateExercise.objects.filter(template=template).count()
             validated_data['order'] = max_order + 1
         return super().create(validated_data)
+
     
 class WorkoutSetSerializer(serializers.ModelSerializer):
     exercise_name = serializers.CharField(source='exercise.name',
